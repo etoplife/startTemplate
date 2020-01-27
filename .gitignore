@@ -3,8 +3,6 @@ node_modules/
 build/
 npm-debug.log
 yarn-error.log
-package-lock.json
-yarn.lock
 
 # Editor directories and files
 .idea

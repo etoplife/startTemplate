@@ -1,5 +1,15 @@
 'use strict';
 
+var autoprefixer = require('autoprefixer');
+var animation = require('postcss-animation');
+var flexbugsFixes = require('postcss-flexbugs-fixes');
+var autoprefixerConfig = ['last 10 versions', '> 5%', 'ie 8'];
+var postcssConfig = [
+	autoprefixer(autoprefixerConfig),
+	animation(),
+	flexbugsFixes(),
+];
+
 //шаблонизатор sass
 module.exports = function () {
 	$.gulp.task('sass:dev', function(){
@@ -13,39 +23,21 @@ module.exports = function () {
 				};
 			}))
 			.pipe($.plugin.sourcemaps.init())//Инициализируем sourcemap, помогает при отладке кода
-			.pipe($.plugin.sass())
+			.pipe($.plugin.sass({
+				includePaths: ['node_modules']
+			}))
+			.pipe($.plugin.postcss(postcssConfig))
 			.pipe($.plugin.sourcemaps.write())//Пропишем карты
 			.pipe($.gulp.dest('./build/static/css/'))//куда
 			.on('end', $.browserSync.reload);
 	});
-
-	//если есть библиотеки нажно добавить таск в gulpfile.js  - 'sassLibs'
-	$.gulp.task('sassLibs', function () {
-		return $.gulp.src([
-			'node_modules/normalize.css/normalize.css',
-			//'node_modules/tiny-slider/dist/tiny-slider.css',
-			//'node_modules/bootstrap/dist/css/bootstrap-reboot.min.css',
-			//'node_modules/bootstrap/dist/css/bootstrap-grid.min.css',
-		])
-			.pipe($.plugin.autoprefixer({
-			  browsers: ['last 10 versions', '> 5%', 'ie 8'],
-			  cascade: true
-			}))
-			.pipe($.plugin.csso())
-			.pipe($.plugin.concat('libs.css'))
-			.pipe($.gulp.dest('./build/static/css/'))
-	});
-
 	
 	$.gulp.task('sass:build', function(){
 		return $.gulp.src([
 			'dev/static/sass/*.sass',
 			])//от куда
 			.pipe($.plugin.sass())
-			.pipe($.plugin.autoprefixer({//автоматически добавляет вендорные префиксы к CSS свойствам
-				browsers: ['last 10 versions', '> 5%', 'ie 8'],
-				cascade: true
-			}))
+			.pipe($.plugin.postcss(postcssConfig))
 			.pipe($.plugin.csscomb())
 			.pipe($.plugin.csso())//minify css, объединение правил для селекторов
 			.pipe($.gulp.dest('./build/static/css/'))//куда
