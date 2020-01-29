@@ -29,7 +29,9 @@ module.exports = function () {
 			.pipe($.plugin.postcss(postcssConfig))
 			.pipe($.plugin.sourcemaps.write())//Пропишем карты
 			.pipe($.gulp.dest('./build/static/css/'))//куда
-			.on('end', $.browserSync.reload);
+			.pipe($.browserSync.reload({
+                stream: true
+            }));
 	});
 	
 	$.gulp.task('sass:build', function(){
